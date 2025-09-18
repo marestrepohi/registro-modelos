@@ -6,6 +6,7 @@ import type { Model } from "@/lib/types";
 import { BarChartComponent } from "@/components/charts/bar-chart";
 import { LineChartComponent } from "@/components/charts/line-chart";
 import { ScatterChartComponent } from "@/components/charts/scatter-chart";
+import { PieChartComponent } from "@/components/charts/pie-chart";
 
 export function VisualizationsTab({ model }: { model: Model }) {
     
@@ -28,6 +29,14 @@ export function VisualizationsTab({ model }: { model: Model }) {
                             </CardHeader>
                             <CardContent>
                                 <LineChartComponent />
+                            </CardContent>
+                        </Card>
+                        <Card className="lg:col-span-2">
+                            <CardHeader>
+                                <CardTitle>Metrics Breakdown</CardTitle>
+                            </CardHeader>
+                            <CardContent>
+                                <PieChartComponent />
                             </CardContent>
                         </Card>
                     </>
