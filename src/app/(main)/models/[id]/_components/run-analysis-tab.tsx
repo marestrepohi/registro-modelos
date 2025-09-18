@@ -2,7 +2,9 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { LineChartComponent } from "@/components/charts/line-chart";
-import { File, GitCommit, Tag } from "lucide-react";
+import { File, GitCommit, Tag, BookOpen, FileJson } from "lucide-react";
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
+import { ScrollArea } from "@/components/ui/scroll-area";
 
 // Mock data representing a single MLflow run, inspired by the mlruns structure.
 const runData = {
@@ -29,7 +31,15 @@ const runData = {
     'model.pkl',
     'input_example.json',
     'conda.yaml',
-  ]
+  ],
+  inputExample: {
+    "columns": ["feature_1", "feature_2", "feature_3", "feature_4"],
+    "data": [
+      [0.2, 0.8, 0.5, 0.1],
+      [0.9, 0.1, 0.3, 0.7],
+      [0.5, 0.5, 0.9, 0.2]
+    ]
+  }
 };
 
 export function RunAnalysisTab() {
@@ -63,9 +73,29 @@ export function RunAnalysisTab() {
 
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
                 <div className="lg:col-span-2 space-y-6">
+                     <Card>
+                        <CardHeader>
+                            <div className="flex items-center gap-2">
+                                <BookOpen className="h-5 w-5 text-muted-foreground" />
+                                <CardTitle>Training Summary</CardTitle>
+                            </div>
+                        </CardHeader>
+                        <CardContent className="text-sm text-muted-foreground space-y-2">
+                            <p>
+                                This run trained a <span className="font-semibold text-foreground">RandomForestRegressor</span> model using <span className="font-semibold text-foreground">scikit-learn</span>.
+                                The process involved several key steps managed by MLflow:
+                            </p>
+                            <ol className="list-decimal list-inside space-y-1 pl-2">
+                                <li><strong>Data Preparation:</strong> A synthetic regression dataset was generated and split into training and testing sets.</li>
+                                <li><strong>Model Training:</strong> A Random Forest model was initialized with parameters <code className="bg-muted px-1 py-0.5 rounded font-mono text-xs">max_depth=2</code> and <code className="bg-muted px-1 py-0.5 rounded font-mono text-xs">random_state=42</code>, and then fitted to the training data.</li>
+                                <li><strong>Logging:</strong> Key hyperparameters and the resulting Mean Squared Error (MSE) metric were logged to the MLflow tracking server.</li>
+                                <li><strong>Model Registration:</strong> The trained model was logged and registered with the MLflow Model Registry, including an input example to define the model's signature.</li>
+                            </ol>
+                        </CardContent>
+                    </Card>
                     <Card>
                         <CardHeader>
-                            <CardTitle>Metric History</CardTitle>
+                            <CardTitle>Metric History (MSE)</CardTitle>
                         </CardHeader>
                         <CardContent>
                             <LineChartComponent />
@@ -104,14 +134,28 @@ export function RunAnalysisTab() {
                             </div>
                         </CardHeader>
                         <CardContent>
-                            <ul className="space-y-2 text-sm">
+                             <ul className="space-y-2 text-sm">
                                 {runData.artifacts.map(artifact => (
-                                    <li key={artifact} className="flex items-center gap-2 font-mono p-2 bg-muted rounded-md">
-                                        <File className="h-4 w-4 text-muted-foreground" />
+                                    <li key={artifact} className="flex items-center gap-2 font-mono p-2 bg-muted rounded-md text-muted-foreground">
+                                        <File className="h-4 w-4" />
                                         {artifact}
                                     </li>
                                 ))}
                             </ul>
+                            <Accordion type="single" collapsible className="w-full mt-4">
+                                <AccordionItem value="item-1">
+                                    <AccordionTrigger>
+                                        <div className="flex items-center gap-2 font-mono text-sm">
+                                            <FileJson className="h-4 w-4" /> Expand input_example.json
+                                        </div>
+                                    </AccordionTrigger>
+                                    <AccordionContent>
+                                        <ScrollArea className="h-48 w-full bg-muted rounded-md">
+                                            <pre className="p-4 text-xs font-mono">{JSON.stringify(runData.inputExample, null, 2)}</pre>
+                                        </ScrollArea>
+                                    </AccordionContent>
+                                </AccordionItem>
+                            </Accordion>
                         </CardContent>
                     </Card>
                      <Card>
@@ -145,3 +189,5 @@ export function RunAnalysisTab() {
         </div>
     );
 }
+
+    
