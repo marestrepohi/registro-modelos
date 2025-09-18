@@ -1,10 +1,6 @@
 'use client';
-
-import { zodResolver } from "@hookform/resolvers/zod";
-import { useForm } from "react-hook-form";
-import * as z from "zod";
-
 import { Button } from "@/components/ui/button";
+import { Switch } from "@/components/ui/switch";
 import {
   Form,
   FormControl,
@@ -23,17 +19,41 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
 import { UploadCloud } from "lucide-react";
 
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useForm } from "react-hook-form";
+import * as z from "zod";
+
+// Define CustomProperty schema
+const customPropertySchema = z.object({ name: z.string(), value: z.string(), type: z.string() });
 // This schema is now based on the fields from ModelProperties.json
 const formSchema = z.object({
-  modelName: z.string().min(3, "Model name must be at least 3 characters."),
-  type: z.enum(["Classification", "Regression", "Clustering"]),
-  version: z.string().min(1, "Version is required."),
-  author: z.string().min(2, "Author name is required."),
-  purpose: z.string().min(10, "Purpose must be at least 10 characters."),
+  id: z.string().uuid("Must be a valid UUID"),
+  name: z.string().min(1, "Name is required."),
+  modelVersionName: z.string().min(1, "Version is required."),
+  description: z.string().min(1, "Description is required."),
+  scoreCodeType: z.string().min(1),
+  algorithm: z.string().min(1),
+  function: z.string().min(1),
+  modeler: z.string().min(1),
+  modelType: z.string().min(1),
+  trainCodeType: z.string().min(1),
+  targetVariable: z.string().min(1),
+  targetEvent: z.string().min(1),
+  targetLevel: z.string().min(1),
+  tool: z.string().min(1),
+  toolVersion: z.string().min(1),
+  externalUrl: z.string().url("Must be a valid URL"),
+  costPerCall: z.string(),
+  immutable: z.boolean(),
+  createdBy: z.string().min(1),
+  creationTimeStamp: z.string().min(1),
+  modifiedBy: z.string().min(1),
+  modifiedTimeStamp: z.string().min(1),
+  customProperties: z.array(customPropertySchema).optional(),
 });
 
 export function GuidedForm() {
@@ -42,10 +62,29 @@ export function GuidedForm() {
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      modelName: "",
-      version: "1.0.0",
-      author: "",
-      purpose: "",
+      id: "",
+      name: "",
+      modelVersionName: "1.0",
+      description: "",
+      scoreCodeType: "python",
+      algorithm: "",
+      function: "classification",
+      modeler: "",
+      modelType: "",
+      trainCodeType: "",
+      targetVariable: "",
+      targetEvent: "",
+      targetLevel: "binary",
+      tool: "Python 3",
+      toolVersion: "3.8",
+      externalUrl: "",
+      costPerCall: "0",
+      immutable: false,
+      createdBy: "",
+      creationTimeStamp: new Date().toISOString(),
+      modifiedBy: "",
+      modifiedTimeStamp: new Date().toISOString(),
+      customProperties: [],
     },
   });
 
@@ -63,106 +102,95 @@ export function GuidedForm() {
       <CardHeader>
         <CardTitle>Create with Form</CardTitle>
         <CardDescription>
-          Fill out the details below to register your new model. This guided process will help ensure all necessary information is provided.
+          Fill out all the details below to register your new model.
         </CardDescription>
       </CardHeader>
       <CardContent>
         <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
-            <FormField
-              control={form.control}
-              name="modelName"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Model Name</FormLabel>
-                  <FormControl>
-                    <Input placeholder="e.g., Customer Churn Predictor" {...field} />
-                  </FormControl>
-                  <FormDescription>A unique and descriptive name for your model.</FormDescription>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="type"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Model Type</FormLabel>
-                  <Select onValueChange={field.onChange} defaultValue={field.value}>
-                    <FormControl>
-                      <SelectTrigger>
-                        <SelectValue placeholder="Select a model type" />
-                      </SelectTrigger>
-                    </FormControl>
-                    <SelectContent>
-                      <SelectItem value="Classification">Classification</SelectItem>
-                      <SelectItem value="Regression">Regression</SelectItem>
-                      <SelectItem value="Clustering">Clustering</SelectItem>
-                    </SelectContent>
-                  </Select>
-                  <FormDescription>The category of machine learning problem this model solves.</FormDescription>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="version"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Version</FormLabel>
-                  <FormControl>
-                    <Input placeholder="e.g., 1.0.0" {...field} />
-                  </FormControl>
-                  <FormDescription>The version of the model.</FormDescription>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-             <FormField
-              control={form.control}
-              name="purpose"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Purpose</FormLabel>
-                  <FormControl>
-                    <Textarea
-                      placeholder="Describe the business case and intended use of this model..."
-                      className="resize-none"
-                      {...field}
-                    />
-                  </FormControl>
-                  <FormDescription>
-                    A clear description of what this model is for.
-                  </FormDescription>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-             <FormField
-              control={form.control}
-              name="author"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Author / Team</FormLabel>
-                  <FormControl>
-                    <Input placeholder="e.g., Data Science Team" {...field} />
-                  </FormControl>
-                  <FormDescription>The person or team responsible for this model.</FormDescription>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <div className="flex justify-end">
-                <Button type="submit">
-                    <UploadCloud className="mr-2 h-4 w-4" />
-                    Register Model
-                </Button>
-            </div>
-          </form>
-        </Form>
-      </CardContent>
-    </Card>
+          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+            {/* ID */}
+            <FormField control={form.control} name="id" render={({ field }) => (
+              <FormItem>
+                <FormLabel>Model ID</FormLabel>
+                <FormControl>
+                  <Input placeholder="UUID" {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}/>
+            {/* Name */}
+            <FormField control={form.control} name="name" render={({ field }) => (
+              <FormItem>
+                <FormLabel>Name</FormLabel>
+                <FormControl><Input {...field} /></FormControl>
+                <FormMessage />
+              </FormItem>
+            )}/>
+            {/* Version */}
+            <FormField control={form.control} name="modelVersionName" render={({ field }) => (
+              <FormItem>
+                <FormLabel>Version</FormLabel>
+                <FormControl><Input {...field} /></FormControl>
+                <FormMessage />
+              </FormItem>
+            )}/>
+            {/* Description */}
+            <FormField control={form.control} name="description" render={({ field }) => (
+              <FormItem>
+                <FormLabel>Description</FormLabel>
+                <FormControl><Textarea className="resize-none" {...field} /></FormControl>
+                <FormMessage />
+              </FormItem>
+            )}/>
+            {/* Algorithm */}
+            <FormField control={form.control} name="algorithm" render={({ field }) => (
+              <FormItem>
+                <FormLabel>Algorithm</FormLabel>
+                <FormControl><Input {...field} /></FormControl>
+                <FormMessage />
+              </FormItem>
+            )}/>
+            {/* Function */}
+            <FormField control={form.control} name="function" render={({ field }) => (
+              <FormItem>
+                <FormLabel>Function</FormLabel>
+                <Select onValueChange={field.onChange} defaultValue={field.value}>
+                  <FormControl><SelectTrigger><SelectValue placeholder="Select" /></SelectTrigger></FormControl>
+                  <SelectContent>
+                    <SelectItem value="classification">Classification</SelectItem>
+                    <SelectItem value="regression">Regression</SelectItem>
+                    <SelectItem value="clustering">Clustering</SelectItem>
+                  </SelectContent>
+                </Select>
+                <FormMessage />
+              </FormItem>
+            )}/>
+            {/* Immutable */}
+            <FormField control={form.control} name="immutable" render={({ field }) => (
+              <FormItem className="flex flex-row items-center space-x-2">
+                <FormControl><Switch checked={field.value} onCheckedChange={field.onChange} /></FormControl>
+                <FormLabel>Immutable</FormLabel>
+                <FormMessage />
+              </FormItem>
+            )}/>
+            {/* Custom Properties as JSON */}
+            <FormField control={form.control} name="customProperties" render={({ field }) => (
+              <FormItem>
+                <FormLabel>Custom Properties (JSON)</FormLabel>
+                <FormControl><Textarea className="font-code" placeholder='[ { "name": "key", "value": "val", "type": "string" } ]' {...field} /></FormControl>
+                <FormDescription>Enter as JSON array of objects.</FormDescription>
+                <FormMessage />
+              </FormItem>
+            )}/>
+             <div className="flex justify-end">
+              <Button type="submit">
+                <UploadCloud className="mr-2 h-4 w-4" />
+                Register Model
+              </Button>
+             </div>
+           </form>
+         </Form>
+       </CardContent>
+     </Card>
   );
 }
