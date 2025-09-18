@@ -1,7 +1,7 @@
 'use client';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import type { Model } from "@/lib/types";
-import { GitBranch, User, Calendar, FileText, CheckCircle } from "lucide-react";
+import { GitBranch, User, Calendar, FileText, BrainCircuit } from "lucide-react";
 import { format } from 'date-fns';
 
 export function OverviewTab({ model }: { model: Model }) {
@@ -55,9 +55,3 @@ export function OverviewTab({ model }: { model: Model }) {
         </div>
     );
 }
-
-// Dummy icon to prevent errors if not present in lucide-react
-const BrainCircuit = (props: React.SVGProps<SVGSVGElement>) => (
-    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}><path d="M12 2a10 10 0 0 0-3.93 19.07"/><path d="M12 2a10 10 0 0 1 3.93 19.07"/><path d="M12 2v20"/><path d="M2 12h20"/><path d="M5 5a7 7 0 0 1 14 0"/><path d="M5 19a7 7 0 0 0 14 0"/><path d="M12 2a7 7 0 0 0-7 7"/><path d="M12 2a7 7 0 0 1 7 7"/><path d="M12 22a7 7 0 0 1-7-7"/><path d="M12 22a7 7 0 0 0 7-7"/></svg>
-  );
-  
