@@ -22,14 +22,18 @@ export interface Alert {
   triggeredAt?: string;
 }
 
-export interface Model {
-  id: string;
-  name: string;
+export interface ModelProperties {
   type: 'Classification' | 'Regression' | 'Clustering';
   version: string;
   author: string;
   createdAt: string;
   purpose: string;
+}
+
+
+export interface Model extends ModelProperties {
+  id: string;
+  name: string;
   status: 'Training' | 'Deployed' | 'Archived' | 'Failed';
   metrics: Metric[];
   governance: GovernanceInfo;

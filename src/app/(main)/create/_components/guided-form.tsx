@@ -27,12 +27,13 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { useToast } from "@/hooks/use-toast";
 import { UploadCloud } from "lucide-react";
 
+// This schema is now based on the fields from ModelProperties.json
 const formSchema = z.object({
   modelName: z.string().min(3, "Model name must be at least 3 characters."),
-  modelType: z.enum(["Classification", "Regression", "Clustering"]),
+  type: z.enum(["Classification", "Regression", "Clustering"]),
+  version: z.string().min(1, "Version is required."),
   author: z.string().min(2, "Author name is required."),
   purpose: z.string().min(10, "Purpose must be at least 10 characters."),
-  dataSource: z.string().url("Please enter a valid URL for the data source."),
 });
 
 export function GuidedForm() {
@@ -42,9 +43,9 @@ export function GuidedForm() {
     resolver: zodResolver(formSchema),
     defaultValues: {
       modelName: "",
+      version: "1.0.0",
       author: "",
       purpose: "",
-      dataSource: "",
     },
   });
 
@@ -84,7 +85,7 @@ export function GuidedForm() {
             />
             <FormField
               control={form.control}
-              name="modelType"
+              name="type"
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>Model Type</FormLabel>
@@ -105,16 +106,16 @@ export function GuidedForm() {
                 </FormItem>
               )}
             />
-             <FormField
+            <FormField
               control={form.control}
-              name="dataSource"
+              name="version"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Primary Data Source</FormLabel>
+                  <FormLabel>Version</FormLabel>
                   <FormControl>
-                    <Input placeholder="e.g., https://your-data-source.com/data.csv" {...field} />
+                    <Input placeholder="e.g., 1.0.0" {...field} />
                   </FormControl>
-                  <FormDescription>The URL of the primary dataset used for training.</FormDescription>
+                  <FormDescription>The version of the model.</FormDescription>
                   <FormMessage />
                 </FormItem>
               )}

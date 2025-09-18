@@ -1,7 +1,96 @@
 {
-    "type": "Classification",
-    "version": "2.1.0",
-    "author": "Data Science Team",
-    "createdAt": "2023-10-26",
-    "purpose": "To detect fraudulent transactions in real-time."
+   "creationTimeStamp": "2025-03-26T16:58:42.425Z",
+   "createdBy": "katherin.quinones",
+   "modifiedTimeStamp": "2025-03-26T16:58:43.989Z",
+   "modifiedBy": "katherin.quinones",
+   "id": "3de1448c-9ab5-4a1e-8ed7-a6eafbb6be74",
+   "name": "PORV_001_RETIRO-CESANTIAS_PROPENSION",
+   "description": "Modelo de clasificación para predecir si un cliente activo de cesantías va a retirar en los próximos 3 meses o no.",
+   "scoreCodeType": "python",
+   "algorithm": "gradboost",
+   "function": "classification",
+   "modeler": "Laura Camila Cruz De Paula",
+   "modelType": "python",
+   "trainCodeType": "python",
+   "targetVariable": "Retiro de cesantías en los próximos 3 meses",
+   "targetEvent": "1",
+   "targetLevel": "binary",
+   "tool": "Python 3",
+   "toolVersion": "3.8",
+   "externalUrl": "https://github.com/POR12603/Caso_Uso_Retiro_Cesantias",
+   "costPerCall": "0",
+   "immutable": false,
+   "modelVersionName": "1.0",
+   "custom properties": [
+      {
+         "name": "DS_ESMD",
+         "value": "1000001 Activo",
+         "type": "string"
+      },
+      {
+         "name": "DS_FEDI",
+         "value": "1662008400000",
+         "type": "date"
+      },
+      {
+         "name": "DS_FEVE",
+         "value": "1662008400000",
+         "type": "date"
+      },
+      {
+         "name": "DS_FFCL",
+         "value": "1662008400000",
+         "type": "date"
+      },
+      {
+         "name": "DS_FFVL",
+         "value": "1680670800000",
+         "type": "date"
+      },
+      {
+         "name": "DS_FIMO",
+         "value": "CRM Multifondos Pen200 ZTA SMS",
+         "type": "string"
+      },
+      {
+         "name": "M_REMA_INDM",
+         "value": "AUC 0.72",
+         "type": "string"
+      },
+      {
+         "name": "DS_MTMD",
+         "value": "1000001 0.54  1000002 0.81 1000003 0.54 1000005 0.59 1000010 0.72 ",
+         "type": "string"
+      },
+      {
+         "name": "DS_NVMD",
+         "value": "1000002",
+         "type": "string"
+      },
+      {
+         "name": "DS_PRMD",
+         "value": "1000007",
+         "type": "string"
+      },
+      {
+         "name": "DS_TAMD",
+         "value": "1000001",
+         "type": "string"
+      },
+      {
+         "name": "DS_TPAN",
+         "value": "1000003",
+         "type": "string"
+      },
+      {
+         "name": "DS_TEMA",
+         "value": "1000002",
+         "type": "string"
+      },
+      {
+         "name": "DS_TPMD",
+         "value": "1000001",
+         "type": "string"
+      }
+   ]
 }
