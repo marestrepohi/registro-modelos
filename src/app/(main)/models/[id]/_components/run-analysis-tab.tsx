@@ -1,7 +1,16 @@
 'use client';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { useState, useEffect } from 'react';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { LineChartComponent } from "@/components/charts/line-chart";
+import {
+    ResponsiveContainer,
+    LineChart,
+    Line,
+    XAxis,
+    YAxis,
+    Tooltip,
+    CartesianGrid,
+} from 'recharts';
 import { File, GitCommit, Tag, BookOpen, FileJson } from "lucide-react";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -43,9 +52,49 @@ const runData = {
 };
 
 export function RunAnalysisTab() {
-    return (
-        <div className="space-y-6">
-            <Card>
+        // Runs for customer-churn-prediction experiment
+                const runs = [ { id: '63681ff081244aa39c3a18a643b4d953', exp: '929139454095764868' } ];
+                const [selectedRun, setSelectedRun] = useState(runs[0].id);
+                const [metricsData, setMetricsData] = useState<{ timestamp: number; value: number }[]>([]);
+                // Load metrics for selected run
+                useEffect(() => {
+                    const exp = runs.find(r => r.id === selectedRun)?.exp;
+                    if (!exp) return;
+                    fetch(`/mlruns_caso2/${exp}/${selectedRun}/metrics/eval_rmse`)
+                        .then(res => res.text())
+                        .then(text => {
+                            const data = text
+                                .trim()
+                                .split(/\r?\n/)
+                                .map(line => {
+                                    const [ts, val] = line.split(' ');
+                                    return { timestamp: parseInt(ts, 10), value: parseFloat(val) };
+                                });
+                            setMetricsData(data);
+                        })
+                        .catch(console.error);
+                }, [selectedRun]);
+                return (
+                    <div className="space-y-6">
+                        {/* Run selector */}
+                    <Card>
+                        <CardHeader>
+                            <CardTitle>Select Run</CardTitle>
+                        </CardHeader>
+                        <CardContent>
+                            <select
+                                className="border rounded p-2"
+                                value={selectedRun}
+                                onChange={e => setSelectedRun(e.target.value)}
+                            >
+                                                {runs.map(r => (
+                                                    <option key={r.id} value={r.id}>{r.id.slice(0,8)}...</option>
+                                                ))}
+                            </select>
+                        </CardContent>
+                    </Card>
+                            {/* Metrics Summary */}
+                            <Card>
                 <CardHeader>
                     <div className="flex items-center gap-2">
                          <GitCommit className="h-5 w-5 text-muted-foreground" />
@@ -57,16 +106,20 @@ export function RunAnalysisTab() {
                 </CardHeader>
                  <CardContent>
                     <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
-                        {runData.metrics.map(metric => (
-                             <Card key={metric.key}>
-                                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                                    <CardTitle className="text-sm font-medium uppercase">{metric.key}</CardTitle>
-                                </CardHeader>
-                                <CardContent>
-                                    <div className="text-2xl font-bold">{metric.value.toFixed(4)}</div>
-                                </CardContent>
-                            </Card>
-                        ))}
+                                                {metricsData.length > 0 ? (
+                                                    <Card>
+                                                        <CardHeader>
+                                                            <CardTitle className="text-sm font-medium uppercase">eval_rmse</CardTitle>
+                                                        </CardHeader>
+                                                        <CardContent>
+                                                            <div className="text-2xl font-bold">
+                                                                {metricsData[metricsData.length - 1].value.toFixed(4)}
+                                                            </div>
+                                                        </CardContent>
+                                                    </Card>
+                                                ) : (
+                                                    <div>Loading metric...</div>
+                                                )}
                     </div>
                 </CardContent>
             </Card>
@@ -93,14 +146,29 @@ export function RunAnalysisTab() {
                             </ol>
                         </CardContent>
                     </Card>
-                    <Card>
-                        <CardHeader>
-                            <CardTitle>Metric History (MSE)</CardTitle>
-                        </CardHeader>
-                        <CardContent>
-                            <LineChartComponent />
-                        </CardContent>
-                    </Card>
+                                        <Card>
+                                                <CardHeader>
+                                                        <CardTitle>RMSE History</CardTitle>
+                                                </CardHeader>
+                                                <CardContent>
+                                                        {metricsData.length > 0 ? (
+                                                            <ResponsiveContainer width="100%" height={200}>
+                                                                <LineChart data={metricsData.map(d => ({
+                                                                        time: new Date(d.timestamp).toLocaleTimeString(),
+                                                                        value: d.value
+                                                                }))}>
+                                                                    <CartesianGrid strokeDasharray="3 3" />
+                                                                    <XAxis dataKey="time" />
+                                                                    <YAxis />
+                                                                    <Tooltip />
+                                                                    <Line type="monotone" dataKey="value" stroke="#4f46e5" dot={false} />
+                                                                </LineChart>
+                                                            </ResponsiveContainer>
+                                                        ) : (
+                                                            <div>Loading chart...</div>
+                                                        )}
+                                                </CardContent>
+                                        </Card>
                     <Card>
                         <CardHeader>
                              <CardTitle>Parameters</CardTitle>
