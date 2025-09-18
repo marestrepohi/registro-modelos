@@ -1,6 +1,7 @@
 'use client';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { useState, useEffect } from 'react';
+import { useParams } from 'next/navigation';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import {
     ResponsiveContainer,
@@ -52,15 +53,22 @@ const runData = {
 };
 
 export function RunAnalysisTab() {
-        // Runs for customer-churn-prediction experiment
-                const runs = [ { id: '63681ff081244aa39c3a18a643b4d953', exp: '929139454095764868' } ];
-                const [selectedRun, setSelectedRun] = useState(runs[0].id);
+        const params = useParams();
+        const modelId = params.id;
+        // Define runs mapping per model
+        const runsByModel: Record<string, { id: string; exp: string }[]> = {
+            'customer-churn-prediction': [ { id: '63681ff081244aa39c3a18a643b4d953', exp: '929139454095764868' } ],
+            'fraud-detection-v2': [ { id: '63681ff081244aa39c3a18a643b4d953', exp: '929139454095764868' } ],
+        };
+        const runs = runsByModel[modelId] || [];
+        const [selectedRun, setSelectedRun] = useState(runs[0]?.id || '');
                 const [metricsData, setMetricsData] = useState<{ timestamp: number; value: number }[]>([]);
-                // Load metrics for selected run
-                useEffect(() => {
-                    const exp = runs.find(r => r.id === selectedRun)?.exp;
-                    if (!exp) return;
-                    fetch(`/mlruns_caso2/${exp}/${selectedRun}/metrics/eval_rmse`)
+                    // Load metrics for selected run
+                    useEffect(() => {
+                        const run = runs.find(r => r.id === selectedRun);
+                        if (!run) return;
+                        const base = modelId === 'fraud-detection-v2' ? 'mlruns_caso1/mlruns' : 'mlruns_caso2';
+                        fetch(`/${base}/${run.exp}/${run.id}/metrics/eval_rmse`)
                         .then(res => res.text())
                         .then(text => {
                             const data = text
