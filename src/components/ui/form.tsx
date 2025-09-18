@@ -46,8 +46,26 @@ const useFormField = () => {
   const itemContext = React.useContext(FormItemContext)
   const form = useFormContext()
 
-  if (!fieldContext) {
-    throw new Error("useFormField should be used within <FormField>")
+  if (!fieldContext?.name || !itemContext?.id) {
+    return {
+      id: '',
+      name: '' as any,
+      formItemId: '',
+      formDescriptionId: '',
+      formMessageId: '',
+      error: undefined,
+    }
+  }
+  
+  if (!form) {
+     return {
+      id: itemContext.id,
+      name: fieldContext.name,
+      formItemId: `${itemContext.id}-form-item`,
+      formDescriptionId: `${itemContext.id}-form-item-description`,
+      formMessageId: `${itemContext.id}-form-item-message`,
+      error: undefined,
+    }
   }
 
   const { getFieldState, formState } = form
@@ -93,6 +111,8 @@ const FormLabel = React.forwardRef<
 >(({ className, ...props }, ref) => {
   const { error, formItemId } = useFormField()
 
+  if (!formItemId) return null;
+
   return (
     <Label
       ref={ref}
@@ -109,6 +129,8 @@ const FormControl = React.forwardRef<
   React.ComponentPropsWithoutRef<typeof Slot>
 >(({ ...props }, ref) => {
   const { error, formItemId, formDescriptionId, formMessageId } = useFormField()
+
+  if (!formItemId) return null;
 
   return (
     <Slot
@@ -131,6 +153,8 @@ const FormDescription = React.forwardRef<
   React.HTMLAttributes<HTMLParagraphElement>
 >(({ className, ...props }, ref) => {
   const { formDescriptionId } = useFormField()
+
+  if (!formDescriptionId) return null;
 
   return (
     <p
