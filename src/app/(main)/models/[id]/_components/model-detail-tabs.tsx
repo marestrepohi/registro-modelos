@@ -6,7 +6,7 @@ import { MetricsTab } from './metrics-tab';
 import { VisualizationsTab } from './visualizations-tab';
 import { GovernanceTab } from './governance-tab';
 import { AlertsTab } from './alerts-tab';
-import { MLflowTab } from './mlflow-tab';
+import { RunAnalysisTab } from './run-analysis-tab';
 
 export default function ModelDetailTabs({ model }: { model: Model }) {
     return (
@@ -17,7 +17,7 @@ export default function ModelDetailTabs({ model }: { model: Model }) {
                 <TabsTrigger value="visualizations">Visualizations</TabsTrigger>
                 <TabsTrigger value="governance">Data Governance</TabsTrigger>
                 <TabsTrigger value="alerts">Alerts</TabsTrigger>
-                <TabsTrigger value="mlflow">MLflow</TabsTrigger>
+                <TabsTrigger value="run-analysis">Run Analysis</TabsTrigger>
             </TabsList>
             <TabsContent value="overview" className="mt-6">
                 <OverviewTab model={model} />
@@ -34,8 +34,8 @@ export default function ModelDetailTabs({ model }: { model: Model }) {
             <TabsContent value="alerts" className="mt-6">
                 <AlertsTab model={model} />
             </TabsContent>
-            <TabsContent value="mlflow" className="mt-6">
-                <MLflowTab />
+            <TabsContent value="run-analysis" className="mt-6">
+                <RunAnalysisTab />
             </TabsContent>
         </Tabs>
     );

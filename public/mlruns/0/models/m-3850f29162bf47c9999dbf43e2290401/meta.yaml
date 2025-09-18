@@ -1,0 +1,10 @@
+artifact_location: file:///home/ec2-user/pruebas_mlops/mlflow/mlruns/0/models/m-3850f29162bf47c9999dbf43e2290401/artifacts
+creation_timestamp: 1758201402090
+experiment_id: '0'
+last_updated_timestamp: 1758201404848
+model_id: m-3850f29162bf47c9999dbf43e2290401
+model_type: null
+name: sklearn-model
+source_run_id: bb39439b748d492fb3a4d9f01cdb6d96
+status: 2
+status_message: null

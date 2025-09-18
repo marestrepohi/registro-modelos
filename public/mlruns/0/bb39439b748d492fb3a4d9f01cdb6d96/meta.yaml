@@ -1,0 +1,14 @@
+artifact_uri: file:///home/ec2-user/pruebas_mlops/mlflow/mlruns/0/bb39439b748d492fb3a4d9f01cdb6d96/artifacts
+end_time: 1758201404869
+entry_point_name: ''
+experiment_id: '0'
+lifecycle_stage: active
+run_id: bb39439b748d492fb3a4d9f01cdb6d96
+run_name: melodic-worm-930
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1758201401961
+status: 3
+tags: []
+user_id: ec2-user
