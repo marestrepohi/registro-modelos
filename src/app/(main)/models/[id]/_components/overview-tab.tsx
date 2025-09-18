@@ -1,10 +1,55 @@
+
 'use client';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import type { Model } from "@/lib/types";
 import { GitBranch, User, Calendar, FileText, BrainCircuit } from "lucide-react";
 import { format } from 'date-fns';
+import { useEffect, useState } from "react";
 
-export function OverviewTab({ model }: { model: Model }) {
+// The shape of our model properties based on ModelProperties.json
+interface ModelProperties {
+  type: string;
+  version: string;
+  author: string;
+  createdAt: string;
+  purpose: string;
+}
+
+export function OverviewTab() {
+    const [model, setModel] = useState<ModelProperties | null>(null);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState<string | null>(null);
+
+    useEffect(() => {
+        async function fetchModelProperties() {
+            try {
+                const response = await fetch('/ModelProperties.json');
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                const data: ModelProperties = await response.json();
+                setModel(data);
+            } catch (e: any) {
+                setError(e.message);
+            } finally {
+                setLoading(false);
+            }
+        }
+
+        fetchModelProperties();
+    }, []);
+
+    if (loading) {
+        return <div>Loading overview...</div>;
+    }
+
+    if (error) {
+        return <div>Error loading model properties: {error}</div>;
+    }
+
+    if (!model) {
+        return <div>No model properties found.</div>;
+    }
+
     return (
         <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
              <Card>

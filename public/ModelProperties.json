@@ -1,0 +1,10 @@
+{
+  "id": "fraud-detection-v2",
+  "name": "Fraud Detection V2",
+  "type": "Classification",
+  "version": "2.1.0",
+  "author": "Data Science Team",
+  "createdAt": "2023-10-26",
+  "purpose": "To detect fraudulent transactions in real-time.",
+  "status": "Deployed"
+}

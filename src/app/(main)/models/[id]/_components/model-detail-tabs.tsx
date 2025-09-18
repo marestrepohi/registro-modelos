@@ -7,20 +7,22 @@ import { VisualizationsTab } from './visualizations-tab';
 import { GovernanceTab } from './governance-tab';
 import { AlertsTab } from './alerts-tab';
 import { RunAnalysisTab } from './run-analysis-tab';
+import { MLflowTab } from './mlflow-tab';
 
 export default function ModelDetailTabs({ model }: { model: Model }) {
     return (
         <Tabs defaultValue="overview" className="w-full">
-            <TabsList className="grid w-full grid-cols-2 md:grid-cols-6">
+            <TabsList className="grid w-full grid-cols-2 md:grid-cols-7">
                 <TabsTrigger value="overview">Overview</TabsTrigger>
                 <TabsTrigger value="metrics">Metrics</TabsTrigger>
                 <TabsTrigger value="visualizations">Visualizations</TabsTrigger>
                 <TabsTrigger value="governance">Data Governance</TabsTrigger>
                 <TabsTrigger value="alerts">Alerts</TabsTrigger>
                 <TabsTrigger value="run-analysis">Run Analysis</TabsTrigger>
+                <TabsTrigger value="mlflow">MLflow</TabsTrigger>
             </TabsList>
             <TabsContent value="overview" className="mt-6">
-                <OverviewTab model={model} />
+                <OverviewTab />
             </TabsContent>
             <TabsContent value="metrics" className="mt-6">
                 <MetricsTab model={model} />
@@ -36,6 +38,9 @@ export default function ModelDetailTabs({ model }: { model: Model }) {
             </TabsContent>
             <TabsContent value="run-analysis" className="mt-6">
                 <RunAnalysisTab />
+            </TabsContent>
+            <TabsContent value="mlflow" className="mt-6">
+                <MLflowTab />
             </TabsContent>
         </Tabs>
     );
