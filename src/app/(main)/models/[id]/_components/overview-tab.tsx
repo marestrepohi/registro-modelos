@@ -49,6 +49,9 @@ export function OverviewTab() {
     if (!model) {
         return <div>No model properties found.</div>;
     }
+    
+    const isValidDate = !isNaN(new Date(model.createdAt).getTime());
+
 
     return (
         <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
@@ -85,7 +88,9 @@ export function OverviewTab() {
                     <Calendar className="h-4 w-4 text-muted-foreground" />
                 </CardHeader>
                 <CardContent>
-                    <div className="text-2xl font-bold">{format(new Date(model.createdAt), 'MMM d, yyyy')}</div>
+                    <div className="text-2xl font-bold">
+                        {isValidDate ? format(new Date(model.createdAt), 'MMM d, yyyy') : 'Invalid Date'}
+                    </div>
                 </CardContent>
             </Card>
             <Card className="md:col-span-2">
