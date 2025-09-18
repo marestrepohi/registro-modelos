@@ -12,18 +12,11 @@ import { Input } from '@/components/ui/input';
 import { useState } from 'react';
 
 const formSchema = z.object({
-  library: z.enum(['scikit-learn', 'tensorflow', 'pytorch']),
-  modelType: z.string().min(1, 'Please select a model type.'),
-  features: z.string().min(1, 'Please enter feature names.'),
-  target: z.string().min(1, 'Please enter the target variable name.'),
+  registeredModelName: z.string().min(3, 'Registered model name is required.'),
 });
 
 const placeholderCode = `
-# Generated Python code will appear here
-# based on your selections above.
-
-def example_function():
-    pass
+# Generated Python code for MLflow model registration will appear here.
 `;
 
 export function CodeForm() {
@@ -31,46 +24,62 @@ export function CodeForm() {
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      features: '',
-      target: '',
+      registeredModelName: 'sk-learn-random-forest-reg-model',
     },
   });
 
   function onSubmit(values: z.infer<typeof formSchema>) {
     const code = `
-# Generated with Modelo Maestro
-# Library: ${values.library}
-# Model Type: ${values.modelType}
-
-import pandas as pd
+from sklearn.datasets import make_regression
+from sklearn.ensemble import RandomForestRegressor
+from sklearn.metrics import mean_squared_error
 from sklearn.model_selection import train_test_split
-from sklearn.ensemble import RandomForestClassifier
-from sklearn.metrics import accuracy_score
+import mlflow
+import mlflow.sklearn
 
-# Load your data
-# data = pd.read_csv('your_data.csv')
+# Note: Ensure your MLflow tracking server is running.
+# You can start it with: mlflow server --host 127.0.0.1 --port 8080
 
-# Define features and target
-features = [${values.features.split(',').map(f => `'${f.trim()}'`).join(', ')}]
-target = '${values.target}'
+# Set the tracking URI if your server is not on localhost
+# mlflow.set_tracking_uri("http://127.0.0.1:8080")
 
-# X = data[features]
-# y = data[target]
+print("Starting MLflow run...")
 
-# X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+with mlflow.start_run() as run:
+    # --- 1. Data Preparation ---
+    X, y = make_regression(n_features=4, n_informative=2, random_state=0, shuffle=False)
+    X_train, X_test, y_train, y_test = train_test_split(
+        X, y, test_size=0.2, random_state=42
+    )
 
-# Initialize and train the model
-# model = RandomForestClassifier(n_estimators=100, random_state=42)
-# model.fit(X_train, y_train)
+    # --- 2. Model Training ---
+    params = {"max_depth": 2, "random_state": 42}
+    model = RandomForestRegressor(**params)
+    model.fit(X_train, y_train)
 
-# Make predictions
-# predictions = model.predict(X_test)
+    # --- 3. Logging to MLflow ---
+    # Log parameters
+    mlflow.log_params(params)
 
-# Evaluate the model
-# accuracy = accuracy_score(y_test, predictions)
-# print(f"Model Accuracy: {accuracy}")
+    # Log metrics
+    y_pred = model.predict(X_test)
+    mse = mean_squared_error(y_test, y_pred)
+    mlflow.log_metrics({"mse": mse})
+    print(f"Logged MSE: {mse}")
 
-print("Code generated successfully. Fill in the data loading and execution steps.")
+    # --- 4. Log and Register Model ---
+    print("Logging and registering the model to MLflow...")
+    mlflow.sklearn.log_model(
+        sk_model=model,
+        artifact_path="sklearn-model", # This is a folder name within the run artifacts
+        input_example=X_train,
+        registered_model_name="${values.registeredModelName}",
+    )
+
+    print("\\nSuccessfully registered model '${values.registeredModelName}'.")
+    print(f"Run ID: {run.info.run_id}")
+
+print("\\nScript finished. Check your MLflow UI for the new run and registered model.")
     `;
     setGeneratedCode(code.trim());
   }
@@ -78,9 +87,9 @@ print("Code generated successfully. Fill in the data loading and execution steps
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Create with Code</CardTitle>
+        <CardTitle>Create and Register with MLflow</CardTitle>
         <CardDescription>
-          Generate a Python script skeleton by filling out the options below.
+          Generate a Python script to train a model and register it with MLflow.
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-6">
@@ -88,97 +97,40 @@ print("Code generated successfully. Fill in the data loading and execution steps
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
             <FormField
               control={form.control}
-              name="library"
+              name="registeredModelName"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>ML Library</FormLabel>
-                  <Select onValueChange={field.onChange} defaultValue={field.value}>
-                    <FormControl>
-                      <SelectTrigger>
-                        <SelectValue placeholder="Select a library" />
-                      </SelectTrigger>
-                    </FormControl>
-                    <SelectContent>
-                      <SelectItem value="scikit-learn">Scikit-learn</SelectItem>
-                      <SelectItem value="tensorflow" disabled>TensorFlow (coming soon)</SelectItem>
-                      <SelectItem value="pytorch" disabled>PyTorch (coming soon)</SelectItem>
-                    </SelectContent>
-                  </Select>
+                  <FormLabel>Registered Model Name</FormLabel>
+                  <FormControl>
+                    <Input placeholder="e.g., sk-learn-random-forest-reg-model" {...field} />
+                  </FormControl>
                   <FormMessage />
                 </FormItem>
               )}
             />
-             <FormField
-              control={form.control}
-              name="modelType"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Model Type</FormLabel>
-                  <Select onValueChange={field.onChange} defaultValue={field.value}>
-                    <FormControl>
-                      <SelectTrigger>
-                        <SelectValue placeholder="Select a model type" />
-                      </SelectTrigger>
-                    </FormControl>
-                    <SelectContent>
-                      <SelectItem value="RandomForestClassifier">Random Forest Classifier</SelectItem>
-                      <SelectItem value="LinearRegression">Linear Regression</SelectItem>
-                      <SelectItem value="KMeans">K-Means Clustering</SelectItem>
-                    </SelectContent>
-                  </Select>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="features"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Feature Names</FormLabel>
-                  <FormControl>
-                    <Input placeholder="e.g., age, income, city (comma-separated)" {...field} />
-                  </FormControl>
-                   <FormMessage />
-                </FormItem>
-              )}
-            />
-             <FormField
-              control={form.control}
-              name="target"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Target Variable Name</FormLabel>
-                  <FormControl>
-                    <Input placeholder="e.g., churn_status" {...field} />
-                  </FormControl>
-                   <FormMessage />
-                </FormItem>
-              )}
-            />
-             <div className="flex justify-start">
-                <Button type="submit" variant="outline">
-                    <Code className="mr-2 h-4 w-4" />
-                    Generate Code
-                </Button>
+            <div className="flex justify-start">
+              <Button type="submit" variant="outline">
+                <Code className="mr-2 h-4 w-4" />
+                Generate Code
+              </Button>
             </div>
           </form>
         </Form>
         
         <div className="space-y-2">
-            <FormLabel>Generated Code</FormLabel>
+            <FormLabel>Generated MLflow Registration Code</FormLabel>
             <Textarea 
                 value={generatedCode}
                 readOnly
-                placeholder="import sklearn..." 
+                placeholder="Your generated Python script will appear here..." 
                 className="min-h-[400px] font-code text-sm bg-muted" 
             />
         </div>
 
         <div className="flex justify-end">
-          <Button>
+          <Button disabled>
             <UploadCloud className="mr-2 h-4 w-4" />
-            Register Model
+            Register from Script (Coming Soon)
           </Button>
         </div>
       </CardContent>
